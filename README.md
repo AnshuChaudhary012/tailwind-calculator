@@ -2,6 +2,11 @@
 
 A clean, responsive, and feature-rich calculator built with modern **Tailwind CSS** and vanilla **JavaScript**.
 
+## 🔗 Links
+
+- **Live Demo**: [tailwind-calculator-iota.vercel.app](https://tailwind-calculator-iota.vercel.app)
+- **GitHub Repository**: [github.com/AnshuChaudhary012/tailwind-calculator](https://github.com/AnshuChaudhary012/tailwind-calculator)
+
 ## ✨ Features
 
 - **Modern Responsive Design**: Glassmorphic styling with smooth active states, hover transitions, and dark/light mode toggle.
