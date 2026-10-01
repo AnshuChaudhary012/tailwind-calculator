@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Tailwind Calculator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+          },
+          boxShadow: {
+            'custom': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(156, 163, 175, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-100 via-slate-200 to-indigo-100 dark:from-slate-950 dark:via-slate-900 dark:to-zinc-950 text-slate-800 dark:text-slate-100 min-h-screen flex items-center justify-center p-4 transition-colors duration-300 font-sans">
+
+  <!-- Calculator Shell -->
+  <div class="w-full max-w-sm sm:max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl shadow-2xl p-5 sm:p-6 relative overflow-hidden transition-all duration-300">
+    
+    <!-- Header: Title, Sound, History, Theme controls -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400">Calculator</span>
+      </div>
+
+      <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/60 p-1 rounded-full text-slate-600 dark:text-slate-400">
+        <!-- Sound Toggle -->
+        <button id="btnSoundToggle" aria-label="Toggle Sound" title="Sound Effects" class="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors">
+          <svg id="iconSoundOn" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z"/>
+          </svg>
+          <svg id="iconSoundOff" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+          </svg>
+        </button>
+
+        <!-- History Drawer Toggle -->
+        <button id="btnToggleHistory" aria-label="View History" title="Calculation History" class="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors relative">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span id="historyBadge" class="hidden absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-indigo-500"></span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="btnThemeToggle" aria-label="Toggle Theme" title="Toggle Light/Dark Theme" class="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors">
+          <svg id="iconThemeLight" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg id="iconThemeDark" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Screen / Display Section -->
+    <div class="bg-slate-100/90 dark:bg-slate-950/80 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 sm:p-5 mb-5 flex flex-col justify-end text-right min-h-[110px] shadow-inner select-none transition-all">
+      <!-- Previous Expression -->
+      <div id="prevDisplay" class="text-sm font-mono text-slate-500 dark:text-slate-400 min-h-[1.4rem] tracking-wide break-all truncate"></div>
+      
+      <!-- Current Value Display -->
+      <div id="currDisplay" class="text-4xl sm:text-5xl font-mono font-bold tracking-tight text-slate-900 dark:text-white overflow-x-auto whitespace-nowrap scrollbar-none py-1 transition-all">
+        0
+      </div>
+    </div>
+
+    <!-- Keypad Grid -->
+    <div class="grid grid-cols-4 gap-2.5 sm:gap-3 select-none">
+      <!-- Row 1 -->
+      <button data-action="clear" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 active:scale-95 border border-rose-200 dark:border-rose-500/20 shadow-sm transition-all duration-150">
+        AC
+      </button>
+      <button data-action="delete" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 active:scale-95 border border-amber-200 dark:border-amber-500/20 shadow-sm transition-all duration-150 flex items-center justify-center">
+        <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414-6.414A2 2 0 0110.828 5H20a2 2 0 012 2v10a2 2 0 01-2 2h-9.172a2 2 0 01-1.414-.586L3 12z"/>
+        </svg>
+      </button>
+      <button data-action="percent" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 dark:hover:bg-slate-700/60 active:scale-95 border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        %
+      </button>
+      <button data-operator="÷" class="py-3.5 sm:py-4 rounded-2xl font-bold text-xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/15 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 active:scale-95 border border-indigo-200 dark:border-indigo-500/30 shadow-sm transition-all duration-150">
+        ÷
+      </button>
+
+      <!-- Row 2 -->
+      <button data-number="7" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        7
+      </button>
+      <button data-number="8" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        8
+      </button>
+      <button data-number="9" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        9
+      </button>
+      <button data-operator="×" class="py-3.5 sm:py-4 rounded-2xl font-bold text-xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/15 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 active:scale-95 border border-indigo-200 dark:border-indigo-500/30 shadow-sm transition-all duration-150">
+        ×
+      </button>
+
+      <!-- Row 3 -->
+      <button data-number="4" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        4
+      </button>
+      <button data-number="5" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        5
+      </button>
+      <button data-number="6" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        6
+      </button>
+      <button data-operator="-" class="py-3.5 sm:py-4 rounded-2xl font-bold text-xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/15 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 active:scale-95 border border-indigo-200 dark:border-indigo-500/30 shadow-sm transition-all duration-150">
+        −
+      </button>
+
+      <!-- Row 4 -->
+      <button data-number="1" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        1
+      </button>
+      <button data-number="2" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        2
+      </button>
+      <button data-number="3" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        3
+      </button>
+      <button data-operator="+" class="py-3.5 sm:py-4 rounded-2xl font-bold text-xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/15 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 active:scale-95 border border-indigo-200 dark:border-indigo-500/30 shadow-sm transition-all duration-150">
+        +
+      </button>
+
+      <!-- Row 5 -->
+      <button data-action="negate" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-lg text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 dark:hover:bg-slate-700/60 active:scale-95 border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        ±
+      </button>
+      <button data-number="0" class="py-3.5 sm:py-4 rounded-2xl font-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        0
+      </button>
+      <button data-action="decimal" class="py-3.5 sm:py-4 rounded-semibold text-xl text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 active:scale-95 border border-slate-200/80 dark:border-slate-700/50 shadow-sm transition-all duration-150">
+        .
+      </button>
+      <button data-action="equals" class="py-3.5 sm:py-4 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 shadow-md shadow-indigo-500/25 active:scale-95 border border-indigo-400/40 transition-all duration-150">
+        =
+      </button>
+    </div>
+
+    <!-- Quick Keyboard Guide -->
+    <div class="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+      <span>Keyboard Ready</span>
+      <span class="font-mono text-[10px]">Esc (AC) · ⌫ (DEL) · ↵ (=)</span>
+    </div>
+
+    <!-- History Drawer Overlay -->
+    <div id="historyDrawer" class="absolute inset-x-0 bottom-0 top-[60px] bg-white/98 dark:bg-slate-900/98 backdrop-blur-2xl p-5 rounded-b-3xl border-t border-slate-200 dark:border-slate-800 flex flex-col justify-between transform translate-y-full opacity-0 pointer-events-none transition-all duration-300 z-20">
+      <div>
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="font-semibold text-sm text-slate-800 dark:text-slate-200">Calculation History</h3>
+          </div>
+          <button id="btnClearHistory" class="text-xs text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 font-medium transition-colors">
+            Clear All
+          </button>
+        </div>
+
+        <div id="historyList" class="mt-3 space-y-2 max-h-[300px] overflow-y-auto pr-1">
+          <!-- History items will be dynamically injected here -->
+        </div>
+      </div>
+
+      <button id="btnCloseHistory" class="w-full mt-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider transition-colors">
+        Close History
+      </button>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
